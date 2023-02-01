@@ -1,0 +1,131 @@
+swagger: "2.0"
+info:
+  title: MovingApi
+  description: MovingApi
+  version: 1.0.0
+host: 0.0.0.0:8081
+schemes:
+  - http
+basePath: /v1
+paths:
+  /assets:
+    post:
+      summary: Upload an asset
+      operationId: UploadAsset
+      produces:
+        - "application/json"
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: path
+          in: formData
+          type: string
+          required: true
+        - name: name
+          type: string
+          in: formData
+          required: true
+        - name: file
+          type: file
+          required: true
+          in: formData
+        - name: contentType
+          type: string
+          required: true
+          in: formData
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/AssetDataResponse'
+        400:
+          description: BadRequest
+          schema:
+            type: string
+  /assets/{path}/{name}:
+    get:
+      summary: Retrieve the metadata of an asset
+      operationId: GetAsset
+      produces:
+        - application/json
+      consumes:
+        - "application/json"
+      parameters:
+        - name: path
+          type: string
+          in: path
+          required: true
+        - name: name
+          type: string
+          in: path
+          required: true
+          description: 如果为支持通配*，则获取所有path下的内容
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/AssetData'
+        400:
+          description: BadRequest
+          schema:
+            type: string
+        404:
+          description: NotFound
+  /assets/download/{path}/{name}:
+    get:
+      summary: Download an asset
+      operationId: DownloadAsset
+      produces:
+        - application/json
+      consumes:
+        - application/json
+        - image/jpeg
+        - image/png
+        - image/gif
+        - text/plain
+        - application/octet-stream
+      parameters:
+        - name: path
+          type: string
+          in: path
+          required: true
+        - name: name
+          type: string
+          in: path
+          required: true
+      responses:
+        200:
+          description: OK
+        400:
+          description: BadRequest
+          schema:
+            type: string
+        404:
+          description: NotFound
+definitions:
+  AssetData:
+    type: object
+    properties:
+      path:
+        type: string
+      size:
+        type: integer
+      name:
+        type: string
+      lastModified:
+        type: string
+      contentType:
+        type: string
+  AssetDataResponse:
+    type: object
+    properties:
+      messages:
+        type: string
+      code:
+        type: integer
+        default: 0
+      data:
+        type: object
+        $ref: '#/definitions/AssetData'
