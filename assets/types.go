@@ -57,7 +57,7 @@ func (a Asset) ToModel() *models.AssetData {
 type AssetStore interface {
 	SaveAsset(asset *AssetData) error
 	QueryAssets(path string) ([]*AssetData, error)
-	Shutdown() error
+	DeleteAsset(asset *AssetData) error
 }
 
 type AssetData struct {
@@ -81,6 +81,7 @@ func ParseAsset(asset *Asset) *AssetData {
 type Cache interface {
 	CacheAsset(a *Asset) error
 	GetAssets(path string) (AssetMap, error)
+	DeleteAssets(path string) error
 	CacheAssets(path string, am AssetMap) error
 }
 

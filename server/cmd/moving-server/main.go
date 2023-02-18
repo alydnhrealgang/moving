@@ -23,12 +23,12 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	api := operations.NewMovingAPIAPI(swaggerSpec)
+	api := operations.NewMovingAPI(swaggerSpec)
 	server := restapi.NewServer(api)
 	defer server.Shutdown()
 
 	parser := flags.NewParser(server, flags.Default)
-	parser.ShortDescription = "MovingApi"
+	parser.ShortDescription = "Moving"
 	parser.LongDescription = "MovingApi"
 	server.ConfigureFlags()
 	for _, optsGroup := range api.CommandLineOptionsGroups {

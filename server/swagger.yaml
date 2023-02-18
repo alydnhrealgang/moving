@@ -1,13 +1,172 @@
 swagger: "2.0"
 info:
-  title: MovingApi
+  title: Moving
   description: MovingApi
   version: 1.0.0
-host: 0.0.0.0:8081
+host: 192.168.31.49:8443
 schemes:
-  - http
+  - https
 basePath: /v1
 paths:
+  /suggest/{name}/{text}:
+    get:
+      summary: Retrieve a list of texts by given name and text
+      operationId: SuggestTexts
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: name
+          in: path
+          type: string
+          required: true
+        - name: text
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              type: string
+        400:
+          description: BadRequest
+          schema:
+            type: string
+  /items:
+    post:
+      summary: Save a item
+      operationId: SaveItem
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/ItemData'
+      responses:
+        200:
+          description: OK
+          schema:
+            type: string
+        400:
+          description: BadRequest
+          schema:
+            type: string
+  /items/query:
+    get:
+      summary: Query items
+      operationId: QueryItems
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: type
+          in: query
+          type: string
+          required: true
+        - name: tagName
+          in: query
+          type: string
+        - name: keyword
+          in: query
+          type: string
+          required: true
+        - name: startIndex
+          type: integer
+          in: query
+          required: true
+        - name: fetchSize
+          type: integer
+          in: query
+          required: true
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ItemData'
+        400:
+          description: BadRequest
+          schema:
+            type: string
+  /items/move:
+    post:
+      summary: Move items to another box
+      operationId: MoveItems
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              codes:
+                type: array
+                items:
+                  type: string
+              to:
+                type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              moved:
+                type: array
+                items:
+                  $ref: '#/definitions/ItemData'
+              codesNotFound:
+                type: array
+                items:
+                  type: string
+        400:
+          description: BadRequest
+          schema:
+            type: string
+  /item/{code}:
+    get:
+      summary: Get a item or its children
+      operationId: GetItemByCode
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: code
+          in: path
+          type: string
+          required: true
+        - name: childrenOnly
+          in: query
+          type: boolean
+          required: true
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ItemData'
+        400:
+          description: BadRequest
+          schema:
+            type: string
+        404:
+          description: NotFound
+          schema:
+            type: string
   /assets:
     post:
       summary: Upload an asset
@@ -73,6 +232,25 @@ paths:
             type: string
         404:
           description: NotFound
+    delete:
+      summary: Delete an asset
+      operationId: DeleteAsset
+      parameters:
+        - name: path
+          type: string
+          in: path
+          required: true
+        - name: name
+          type: string
+          in: path
+          required: true
+      responses:
+        200:
+          description: OK
+        400:
+          description: BadRequest
+          schema:
+            type: string
   /assets/download/{path}/{name}:
     get:
       summary: Download an asset
@@ -129,3 +307,28 @@ definitions:
       data:
         type: object
         $ref: '#/definitions/AssetData'
+  ItemData:
+    type: object
+    properties:
+      serverID:
+        type: string
+      boxCode:
+        type: string
+      code:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      type:
+        type: string
+      tags:
+        type: object
+        additionalProperties:
+          type: string
+      count:
+        type: integer
+      props:
+        type: object
+        additionalProperties:
+          type: string

@@ -20,9 +20,9 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// NewMovingAPIAPI creates a new MovingAPI instance
-func NewMovingAPIAPI(spec *loads.Document) *MovingAPIAPI {
-	return &MovingAPIAPI{
+// NewMovingAPI creates a new Moving instance
+func NewMovingAPI(spec *loads.Document) *MovingAPI {
+	return &MovingAPI{
 		handlers:            make(map[string]map[string]http.Handler),
 		formats:             strfmt.Default,
 		defaultConsumes:     "application/json",
@@ -45,11 +45,29 @@ func NewMovingAPIAPI(spec *loads.Document) *MovingAPIAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
+		DeleteAssetHandler: DeleteAssetHandlerFunc(func(params DeleteAssetParams) middleware.Responder {
+			return middleware.NotImplemented("operation DeleteAsset has not yet been implemented")
+		}),
 		DownloadAssetHandler: DownloadAssetHandlerFunc(func(params DownloadAssetParams) middleware.Responder {
 			return middleware.NotImplemented("operation DownloadAsset has not yet been implemented")
 		}),
 		GetAssetHandler: GetAssetHandlerFunc(func(params GetAssetParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetAsset has not yet been implemented")
+		}),
+		GetItemByCodeHandler: GetItemByCodeHandlerFunc(func(params GetItemByCodeParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetItemByCode has not yet been implemented")
+		}),
+		MoveItemsHandler: MoveItemsHandlerFunc(func(params MoveItemsParams) middleware.Responder {
+			return middleware.NotImplemented("operation MoveItems has not yet been implemented")
+		}),
+		QueryItemsHandler: QueryItemsHandlerFunc(func(params QueryItemsParams) middleware.Responder {
+			return middleware.NotImplemented("operation QueryItems has not yet been implemented")
+		}),
+		SaveItemHandler: SaveItemHandlerFunc(func(params SaveItemParams) middleware.Responder {
+			return middleware.NotImplemented("operation SaveItem has not yet been implemented")
+		}),
+		SuggestTextsHandler: SuggestTextsHandlerFunc(func(params SuggestTextsParams) middleware.Responder {
+			return middleware.NotImplemented("operation SuggestTexts has not yet been implemented")
 		}),
 		UploadAssetHandler: UploadAssetHandlerFunc(func(params UploadAssetParams) middleware.Responder {
 			return middleware.NotImplemented("operation UploadAsset has not yet been implemented")
@@ -57,8 +75,8 @@ func NewMovingAPIAPI(spec *loads.Document) *MovingAPIAPI {
 	}
 }
 
-/*MovingAPIAPI MovingApi */
-type MovingAPIAPI struct {
+/*MovingAPI MovingApi */
+type MovingAPI struct {
 	spec            *loads.Document
 	context         *middleware.Context
 	handlers        map[string]map[string]http.Handler
@@ -102,10 +120,22 @@ type MovingAPIAPI struct {
 	//   - application/json
 	JSONProducer runtime.Producer
 
+	// DeleteAssetHandler sets the operation handler for the delete asset operation
+	DeleteAssetHandler DeleteAssetHandler
 	// DownloadAssetHandler sets the operation handler for the download asset operation
 	DownloadAssetHandler DownloadAssetHandler
 	// GetAssetHandler sets the operation handler for the get asset operation
 	GetAssetHandler GetAssetHandler
+	// GetItemByCodeHandler sets the operation handler for the get item by code operation
+	GetItemByCodeHandler GetItemByCodeHandler
+	// MoveItemsHandler sets the operation handler for the move items operation
+	MoveItemsHandler MoveItemsHandler
+	// QueryItemsHandler sets the operation handler for the query items operation
+	QueryItemsHandler QueryItemsHandler
+	// SaveItemHandler sets the operation handler for the save item operation
+	SaveItemHandler SaveItemHandler
+	// SuggestTextsHandler sets the operation handler for the suggest texts operation
+	SuggestTextsHandler SuggestTextsHandler
 	// UploadAssetHandler sets the operation handler for the upload asset operation
 	UploadAssetHandler UploadAssetHandler
 
@@ -129,52 +159,52 @@ type MovingAPIAPI struct {
 }
 
 // UseRedoc for documentation at /docs
-func (o *MovingAPIAPI) UseRedoc() {
+func (o *MovingAPI) UseRedoc() {
 	o.useSwaggerUI = false
 }
 
 // UseSwaggerUI for documentation at /docs
-func (o *MovingAPIAPI) UseSwaggerUI() {
+func (o *MovingAPI) UseSwaggerUI() {
 	o.useSwaggerUI = true
 }
 
 // SetDefaultProduces sets the default produces media type
-func (o *MovingAPIAPI) SetDefaultProduces(mediaType string) {
+func (o *MovingAPI) SetDefaultProduces(mediaType string) {
 	o.defaultProduces = mediaType
 }
 
 // SetDefaultConsumes returns the default consumes media type
-func (o *MovingAPIAPI) SetDefaultConsumes(mediaType string) {
+func (o *MovingAPI) SetDefaultConsumes(mediaType string) {
 	o.defaultConsumes = mediaType
 }
 
 // SetSpec sets a spec that will be served for the clients.
-func (o *MovingAPIAPI) SetSpec(spec *loads.Document) {
+func (o *MovingAPI) SetSpec(spec *loads.Document) {
 	o.spec = spec
 }
 
 // DefaultProduces returns the default produces media type
-func (o *MovingAPIAPI) DefaultProduces() string {
+func (o *MovingAPI) DefaultProduces() string {
 	return o.defaultProduces
 }
 
 // DefaultConsumes returns the default consumes media type
-func (o *MovingAPIAPI) DefaultConsumes() string {
+func (o *MovingAPI) DefaultConsumes() string {
 	return o.defaultConsumes
 }
 
 // Formats returns the registered string formats
-func (o *MovingAPIAPI) Formats() strfmt.Registry {
+func (o *MovingAPI) Formats() strfmt.Registry {
 	return o.formats
 }
 
 // RegisterFormat registers a custom format validator
-func (o *MovingAPIAPI) RegisterFormat(name string, format strfmt.Format, validator strfmt.Validator) {
+func (o *MovingAPI) RegisterFormat(name string, format strfmt.Format, validator strfmt.Validator) {
 	o.formats.Add(name, format, validator)
 }
 
-// Validate validates the registrations in the MovingAPIAPI
-func (o *MovingAPIAPI) Validate() error {
+// Validate validates the registrations in the MovingAPI
+func (o *MovingAPI) Validate() error {
 	var unregistered []string
 
 	if o.BinConsumer == nil {
@@ -194,11 +224,29 @@ func (o *MovingAPIAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
+	if o.DeleteAssetHandler == nil {
+		unregistered = append(unregistered, "DeleteAssetHandler")
+	}
 	if o.DownloadAssetHandler == nil {
 		unregistered = append(unregistered, "DownloadAssetHandler")
 	}
 	if o.GetAssetHandler == nil {
 		unregistered = append(unregistered, "GetAssetHandler")
+	}
+	if o.GetItemByCodeHandler == nil {
+		unregistered = append(unregistered, "GetItemByCodeHandler")
+	}
+	if o.MoveItemsHandler == nil {
+		unregistered = append(unregistered, "MoveItemsHandler")
+	}
+	if o.QueryItemsHandler == nil {
+		unregistered = append(unregistered, "QueryItemsHandler")
+	}
+	if o.SaveItemHandler == nil {
+		unregistered = append(unregistered, "SaveItemHandler")
+	}
+	if o.SuggestTextsHandler == nil {
+		unregistered = append(unregistered, "SuggestTextsHandler")
 	}
 	if o.UploadAssetHandler == nil {
 		unregistered = append(unregistered, "UploadAssetHandler")
@@ -212,23 +260,23 @@ func (o *MovingAPIAPI) Validate() error {
 }
 
 // ServeErrorFor gets a error handler for a given operation id
-func (o *MovingAPIAPI) ServeErrorFor(operationID string) func(http.ResponseWriter, *http.Request, error) {
+func (o *MovingAPI) ServeErrorFor(operationID string) func(http.ResponseWriter, *http.Request, error) {
 	return o.ServeError
 }
 
 // AuthenticatorsFor gets the authenticators for the specified security schemes
-func (o *MovingAPIAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map[string]runtime.Authenticator {
+func (o *MovingAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map[string]runtime.Authenticator {
 	return nil
 }
 
 // Authorizer returns the registered authorizer
-func (o *MovingAPIAPI) Authorizer() runtime.Authorizer {
+func (o *MovingAPI) Authorizer() runtime.Authorizer {
 	return nil
 }
 
 // ConsumersFor gets the consumers for the specified media types.
 // MIME type parameters are ignored here.
-func (o *MovingAPIAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Consumer {
+func (o *MovingAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Consumer {
 	result := make(map[string]runtime.Consumer, len(mediaTypes))
 	for _, mt := range mediaTypes {
 		switch mt {
@@ -257,7 +305,7 @@ func (o *MovingAPIAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Cons
 
 // ProducersFor gets the producers for the specified media types.
 // MIME type parameters are ignored here.
-func (o *MovingAPIAPI) ProducersFor(mediaTypes []string) map[string]runtime.Producer {
+func (o *MovingAPI) ProducersFor(mediaTypes []string) map[string]runtime.Producer {
 	result := make(map[string]runtime.Producer, len(mediaTypes))
 	for _, mt := range mediaTypes {
 		switch mt {
@@ -273,7 +321,7 @@ func (o *MovingAPIAPI) ProducersFor(mediaTypes []string) map[string]runtime.Prod
 }
 
 // HandlerFor gets a http.Handler for the provided operation method and path
-func (o *MovingAPIAPI) HandlerFor(method, path string) (http.Handler, bool) {
+func (o *MovingAPI) HandlerFor(method, path string) (http.Handler, bool) {
 	if o.handlers == nil {
 		return nil, false
 	}
@@ -288,8 +336,8 @@ func (o *MovingAPIAPI) HandlerFor(method, path string) (http.Handler, bool) {
 	return h, ok
 }
 
-// Context returns the middleware context for the moving API API
-func (o *MovingAPIAPI) Context() *middleware.Context {
+// Context returns the middleware context for the moving API
+func (o *MovingAPI) Context() *middleware.Context {
 	if o.context == nil {
 		o.context = middleware.NewRoutableContext(o.spec, o, nil)
 	}
@@ -297,12 +345,16 @@ func (o *MovingAPIAPI) Context() *middleware.Context {
 	return o.context
 }
 
-func (o *MovingAPIAPI) initHandlerCache() {
+func (o *MovingAPI) initHandlerCache() {
 	o.Context() // don't care about the result, just that the initialization happened
 	if o.handlers == nil {
 		o.handlers = make(map[string]map[string]http.Handler)
 	}
 
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/assets/{path}/{name}"] = NewDeleteAsset(o.context, o.DeleteAssetHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -311,6 +363,26 @@ func (o *MovingAPIAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/assets/{path}/{name}"] = NewGetAsset(o.context, o.GetAssetHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/item/{code}"] = NewGetItemByCode(o.context, o.GetItemByCodeHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/items/move"] = NewMoveItems(o.context, o.MoveItemsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/items/query"] = NewQueryItems(o.context, o.QueryItemsHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/items"] = NewSaveItem(o.context, o.SaveItemHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/suggest/{name}/{text}"] = NewSuggestTexts(o.context, o.SuggestTextsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -319,7 +391,7 @@ func (o *MovingAPIAPI) initHandlerCache() {
 
 // Serve creates a http handler to serve the API over HTTP
 // can be used directly in http.ListenAndServe(":8000", api.Serve(nil))
-func (o *MovingAPIAPI) Serve(builder middleware.Builder) http.Handler {
+func (o *MovingAPI) Serve(builder middleware.Builder) http.Handler {
 	o.Init()
 
 	if o.Middleware != nil {
@@ -332,24 +404,24 @@ func (o *MovingAPIAPI) Serve(builder middleware.Builder) http.Handler {
 }
 
 // Init allows you to just initialize the handler cache, you can then recompose the middleware as you see fit
-func (o *MovingAPIAPI) Init() {
+func (o *MovingAPI) Init() {
 	if len(o.handlers) == 0 {
 		o.initHandlerCache()
 	}
 }
 
 // RegisterConsumer allows you to add (or override) a consumer for a media type.
-func (o *MovingAPIAPI) RegisterConsumer(mediaType string, consumer runtime.Consumer) {
+func (o *MovingAPI) RegisterConsumer(mediaType string, consumer runtime.Consumer) {
 	o.customConsumers[mediaType] = consumer
 }
 
 // RegisterProducer allows you to add (or override) a producer for a media type.
-func (o *MovingAPIAPI) RegisterProducer(mediaType string, producer runtime.Producer) {
+func (o *MovingAPI) RegisterProducer(mediaType string, producer runtime.Producer) {
 	o.customProducers[mediaType] = producer
 }
 
 // AddMiddlewareFor adds a http middleware to existing handler
-func (o *MovingAPIAPI) AddMiddlewareFor(method, path string, builder middleware.Builder) {
+func (o *MovingAPI) AddMiddlewareFor(method, path string, builder middleware.Builder) {
 	um := strings.ToUpper(method)
 	if path == "/" {
 		path = ""

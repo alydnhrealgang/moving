@@ -5,16 +5,15 @@ import (
 	"reflect"
 )
 
-func CopyMap(a interface{}) interface{} {
-	aValue := reflect.ValueOf(a)
-	aType := aValue.Type()
-	mapType := reflect.MapOf(aType.Key(), aType.Elem())
-	newMap := reflect.MakeMapWithSize(mapType, aValue.Len())
-	keys := aValue.MapKeys()
-	for _, key := range keys {
-		newMap.SetMapIndex(key, aValue.MapIndex(key))
+func CopyMap[K comparable, V any](a map[K]V) map[K]V {
+	if nil == a {
+		return nil
 	}
-	return newMap.Interface()
+	m := make(map[K]V, len(a))
+	for k, v := range a {
+		m[k] = v
+	}
+	return m
 }
 
 func WhereInMapValues(m interface{}, predicate interface{}) interface{} {

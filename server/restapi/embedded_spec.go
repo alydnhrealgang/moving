@@ -19,15 +19,15 @@ var (
 func init() {
 	SwaggerJSON = json.RawMessage([]byte(`{
   "schemes": [
-    "http"
+    "https"
   ],
   "swagger": "2.0",
   "info": {
     "description": "MovingApi",
-    "title": "MovingApi",
+    "title": "Moving",
     "version": "1.0.0"
   },
-  "host": "0.0.0.0:8081",
+  "host": "192.168.31.49:8443",
   "basePath": "/v1",
   "paths": {
     "/assets": {
@@ -172,6 +172,282 @@ func init() {
             "description": "NotFound"
           }
         }
+      },
+      "delete": {
+        "summary": "Delete an asset",
+        "operationId": "DeleteAsset",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "path",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/item/{code}": {
+      "get": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Get a item or its children",
+        "operationId": "GetItemByCode",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "code",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "boolean",
+            "name": "childrenOnly",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ItemData"
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "NotFound",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/items": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Save a item",
+        "operationId": "SaveItem",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/ItemData"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/items/move": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Move items to another box",
+        "operationId": "MoveItems",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "to": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "codesNotFound": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "moved": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/ItemData"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/items/query": {
+      "get": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Query items",
+        "operationId": "QueryItems",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "type",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "tagName",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "keyword",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "name": "startIndex",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "name": "fetchSize",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ItemData"
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/suggest/{name}/{text}": {
+      "get": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Retrieve a list of texts by given name and text",
+        "operationId": "SuggestTexts",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "text",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
       }
     }
   },
@@ -211,20 +487,58 @@ func init() {
           "type": "string"
         }
       }
+    },
+    "ItemData": {
+      "type": "object",
+      "properties": {
+        "boxCode": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "props": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "serverID": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "type": {
+          "type": "string"
+        }
+      }
     }
   }
 }`))
 	FlatSwaggerJSON = json.RawMessage([]byte(`{
   "schemes": [
-    "http"
+    "https"
   ],
   "swagger": "2.0",
   "info": {
     "description": "MovingApi",
-    "title": "MovingApi",
+    "title": "Moving",
     "version": "1.0.0"
   },
-  "host": "0.0.0.0:8081",
+  "host": "192.168.31.49:8443",
   "basePath": "/v1",
   "paths": {
     "/assets": {
@@ -369,6 +683,282 @@ func init() {
             "description": "NotFound"
           }
         }
+      },
+      "delete": {
+        "summary": "Delete an asset",
+        "operationId": "DeleteAsset",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "path",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/item/{code}": {
+      "get": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Get a item or its children",
+        "operationId": "GetItemByCode",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "code",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "boolean",
+            "name": "childrenOnly",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ItemData"
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "NotFound",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/items": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Save a item",
+        "operationId": "SaveItem",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/ItemData"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/items/move": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Move items to another box",
+        "operationId": "MoveItems",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "to": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "codesNotFound": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "moved": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/ItemData"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/items/query": {
+      "get": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Query items",
+        "operationId": "QueryItems",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "type",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "tagName",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "keyword",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "name": "startIndex",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "name": "fetchSize",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ItemData"
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/suggest/{name}/{text}": {
+      "get": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Retrieve a list of texts by given name and text",
+        "operationId": "SuggestTexts",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "text",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
       }
     }
   },
@@ -405,6 +995,44 @@ func init() {
           "$ref": "#/definitions/AssetData"
         },
         "messages": {
+          "type": "string"
+        }
+      }
+    },
+    "ItemData": {
+      "type": "object",
+      "properties": {
+        "boxCode": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "props": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "serverID": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "type": {
           "type": "string"
         }
       }

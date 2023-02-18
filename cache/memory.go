@@ -29,6 +29,13 @@ func (m *Memory) CacheAsset(a *assets.Asset) error {
 	return nil
 }
 
+func (m *Memory) DeleteAssets(path string) error {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	delete(m.pathAssets, path)
+	return nil
+}
+
 func (m *Memory) GetAssets(path string) (assets.AssetMap, error) {
 	m.lock.RLock()
 	defer m.lock.RUnlock()

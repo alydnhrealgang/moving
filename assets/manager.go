@@ -1,6 +1,8 @@
 package assets
 
 import (
+	"errors"
+	"fmt"
 	"github.com/alydnhrealgang/moving/common/utils"
 	"github.com/alydnhrealgang/moving/logs"
 	"time"
@@ -54,8 +56,32 @@ func (m *Manager) Query(path, name string) ([]*Asset, error) {
 		ls.Error(err)
 		return nil, err
 	}
-
 	return am.ToSlice(name), nil
+}
+
+func (m *Manager) Delete(path, name string) error {
+	ls := m.logger.F("path", path).F("name", name).M("Delete")
+	am, err := m.ensure(path, ls)
+	if nil != err {
+		ls.WM("m.ensure(path, ls)").Error(err)
+		return err
+	}
+	asset := am[name]
+	if nil == asset {
+		return errors.New(fmt.Sprintf("Asset: %s/%s not found", path, name))
+	}
+	err = m.cache.DeleteAssets(path)
+	if nil != err {
+		ls.WM("m.cache.DeleteAssets(path)").Error(err)
+		return err
+	}
+	err = m.store.DeleteAsset(asset.ToData())
+	if nil != err {
+		ls.WM("m.store.DeleteAsset(asset.ToData())").Error(err)
+		return err
+	}
+
+	return nil
 }
 
 func (m *Manager) ensure(path string, ls *logs.LogrusScope) (AssetMap, error) {
