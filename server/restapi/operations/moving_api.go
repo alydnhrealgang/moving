@@ -48,6 +48,9 @@ func NewMovingAPI(spec *loads.Document) *MovingAPI {
 		DeleteAssetHandler: DeleteAssetHandlerFunc(func(params DeleteAssetParams) middleware.Responder {
 			return middleware.NotImplemented("operation DeleteAsset has not yet been implemented")
 		}),
+		DeleteItemByCodeHandler: DeleteItemByCodeHandlerFunc(func(params DeleteItemByCodeParams) middleware.Responder {
+			return middleware.NotImplemented("operation DeleteItemByCode has not yet been implemented")
+		}),
 		DownloadAssetHandler: DownloadAssetHandlerFunc(func(params DownloadAssetParams) middleware.Responder {
 			return middleware.NotImplemented("operation DownloadAsset has not yet been implemented")
 		}),
@@ -122,6 +125,8 @@ type MovingAPI struct {
 
 	// DeleteAssetHandler sets the operation handler for the delete asset operation
 	DeleteAssetHandler DeleteAssetHandler
+	// DeleteItemByCodeHandler sets the operation handler for the delete item by code operation
+	DeleteItemByCodeHandler DeleteItemByCodeHandler
 	// DownloadAssetHandler sets the operation handler for the download asset operation
 	DownloadAssetHandler DownloadAssetHandler
 	// GetAssetHandler sets the operation handler for the get asset operation
@@ -226,6 +231,9 @@ func (o *MovingAPI) Validate() error {
 
 	if o.DeleteAssetHandler == nil {
 		unregistered = append(unregistered, "DeleteAssetHandler")
+	}
+	if o.DeleteItemByCodeHandler == nil {
+		unregistered = append(unregistered, "DeleteItemByCodeHandler")
 	}
 	if o.DownloadAssetHandler == nil {
 		unregistered = append(unregistered, "DownloadAssetHandler")
@@ -355,6 +363,10 @@ func (o *MovingAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/assets/{path}/{name}"] = NewDeleteAsset(o.context, o.DeleteAssetHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/item/{code}"] = NewDeleteItemByCode(o.context, o.DeleteItemByCodeHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

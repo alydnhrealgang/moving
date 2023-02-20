@@ -8,6 +8,11 @@ type Memory struct {
 	items map[string]*ItemData
 }
 
+func (m *Memory) DeleteItem(data *ItemData) error {
+	delete(m.items, data.Code)
+	return nil
+}
+
 func (m *Memory) QueryItems(itemType string, name string, value string, index int64, size int64) ([]string, error) {
 	//TODO implement me
 	panic("implement me")

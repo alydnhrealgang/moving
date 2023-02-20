@@ -114,7 +114,17 @@ func configureAPI(api *operations.MovingAPI) http.Handler {
 		}
 
 		if strings.Compare(params.Name, "*") == 0 {
-			return operations.NewGetAssetBadRequest().WithPayload("Name cannot be null")
+			data, err := assetManager.Query(params.Path, utils.EmptyString)
+			if nil != err {
+				return operations.NewDeleteAssetBadRequest().WithPayload(err.Error())
+			}
+			for _, asset := range data {
+				err = assetManager.Delete(asset.Path(), asset.Name())
+				if nil != err {
+					return operations.NewDeleteAssetBadRequest().WithPayload(err.Error())
+				}
+			}
+			return operations.NewDeleteAssetOK()
 		}
 
 		err := assetManager.Delete(params.Path, params.Name)
@@ -226,6 +236,20 @@ func configureAPI(api *operations.MovingAPI) http.Handler {
 				CodesNotFound: codesNotFound,
 				Moved:         lo.Map(moved, itemToModel),
 			})
+		})
+
+	api.DeleteItemByCodeHandler = operations.DeleteItemByCodeHandlerFunc(
+		func(params operations.DeleteItemByCodeParams) middleware.Responder {
+			if utils.EmptyOrWhiteSpace(params.Code) {
+				return operations.NewDeleteItemByCodeBadRequest().WithPayload("code cannot be null")
+			}
+
+			err := itemManager.DeleteItem(params.Code)
+			if nil != err {
+				return operations.NewDeleteItemByCodeBadRequest().WithPayload(err.Error())
+			}
+
+			return operations.NewDeleteItemByCodeOK()
 		})
 
 	api.QueryItemsHandler = operations.QueryItemsHandlerFunc(

@@ -9,4 +9,7 @@ var (
 	FlagProps    = make([]string, 0)
 	FlagTags     = make([]string, 0)
 	FlagFileName = utils.EmptyString
+	FlagFieldMap = make(map[string]string)
+	FlagPropMap  = make(map[string]string)
+	FlagTagMap   = make(map[string]string)
 )

@@ -250,6 +250,41 @@ func init() {
             }
           }
         }
+      },
+      "delete": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Delete an item and its assets",
+        "operationId": "DeleteItemByCode",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "code",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "NotFound",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
       }
     },
     "/items": {
@@ -747,6 +782,41 @@ func init() {
                 "$ref": "#/definitions/ItemData"
               }
             }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "NotFound",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "delete": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Delete an item and its assets",
+        "operationId": "DeleteItemByCode",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "code",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           },
           "400": {
             "description": "BadRequest",

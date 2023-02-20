@@ -15,6 +15,7 @@ type Store interface {
 	GetChildren(code string) ([]string, error)
 	UpdateItemsParentCode(moved []*ItemData, code string) error
 	QueryItems(itemType string, name string, value string, index int64, size int64) ([]string, error)
+	DeleteItem(item *ItemData) error
 }
 
 type ItemData struct {

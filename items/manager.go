@@ -2,6 +2,7 @@ package items
 
 import (
 	"fmt"
+	"github.com/alydnhrealgang/moving/common/utils"
 	"github.com/alydnhrealgang/moving/logs"
 	"github.com/samber/lo"
 	"sync"
@@ -160,6 +161,47 @@ func (m *Manager) loadChildren(item *Item, ls *logs.LogrusScope) error {
 			item.AddChildrenIfLoaded(child)
 		}
 	}
+	return nil
+}
+
+func (m *Manager) DeleteItem(code string) error {
+	ls := m.logger.F("code", code).M("DeleteItem")
+	existItem, err := m.ensureItem(code, true, ls)
+	if nil != err {
+		return err
+	}
+	if nil == existItem {
+		return nil
+	}
+
+	children, _, err := m.GetChildren(code)
+	if nil != err {
+		ls.WM("m.GetChildren(code)").Error(err)
+		return err
+	}
+	if !utils.EmptyArray(children) {
+		return fmt.Errorf("can't delete an item that has children")
+	}
+
+	var parentItem *Item
+	if existItem.HasParent() {
+		parentItem, err = m.ensureItem(existItem.parentCode, true, ls)
+		if nil != err {
+			return err
+		}
+	}
+
+	err = m.store.DeleteItem(existItem.ToData())
+	if nil != err {
+		ls.WM("m.store.DeleteItem(existItem)")
+		return err
+	}
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	if nil != parentItem && parentItem.ChildrenLoaded() {
+		parentItem.DeleteChildren(existItem.code)
+	}
+	delete(m.items, existItem.code)
 	return nil
 }
 

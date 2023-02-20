@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestManagerSaveAndGet(t *testing.T) {
+func TestManagerSaveGetAndDelete(t *testing.T) {
 	store, err := NewBadger("test")
 	assert.Nil(t, err)
 	defer func() {
@@ -70,6 +70,26 @@ func TestManagerSaveAndGet(t *testing.T) {
 	assert.NotEmpty(t, box698500002.Description())
 	assert.Equal(t, box698500002.Name(), item.Name())
 	assert.Equal(t, box698500002.Description(), item.Description())
+
+	err = manager.DeleteItem(box698500001.Code())
+	assert.Nil(t, err)
+	item, err = manager.GetItem(box698500001.Code())
+	assert.Nil(t, err)
+	assert.Nil(t, item)
+
+	err = manager.DeleteItem(box698500002.Code())
+	assert.Nil(t, err)
+	item, err = manager.GetItem(box698500002.Code())
+	assert.Nil(t, err)
+	assert.Nil(t, item)
+
+	manager = items.NewManager(store)
+	item, err = manager.GetItem(box698500001.Code())
+	assert.Nil(t, err)
+	assert.Nil(t, item)
+	item, err = manager.GetItem(box698500002.Code())
+	assert.Nil(t, err)
+	assert.Nil(t, item)
 }
 
 func TestQuery(t *testing.T) {
@@ -286,6 +306,23 @@ func TestManagerItemChildren(t *testing.T) {
 	assert.Nil(t, err)
 	assert.True(t, exists)
 	assert.Len(t, children, 0)
+
+	err = manager.DeleteItem(box698500001.Code())
+	assert.NotNil(t, err)
+
+	err = manager.DeleteItem(item003.Code())
+	assert.Nil(t, err)
+	item, err := manager.GetItem(item003.Code())
+	assert.Nil(t, err)
+	assert.Nil(t, item)
+	children, _, err = manager.GetChildren(box698500001.Code())
+	assert.Nil(t, err)
+	assert.Len(t, children, 2)
+
+	manager = items.NewManager(store)
+	children, _, err = manager.GetChildren(box698500001.Code())
+	assert.Nil(t, err)
+	assert.Len(t, children, 2)
 }
 
 func TestSaveItemWithChangedParentCode(t *testing.T) {

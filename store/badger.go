@@ -152,9 +152,70 @@ func (s *Badger) QueryItems(itemType, tagName, keywordOrTagValue string, startIn
 	return
 }
 
+func (s *Badger) DeleteItem(data *items.ItemData) (err error) {
+	ls := s.logger.F("code", data.Code).M("DeleteItem")
+	dbData, err := json.Marshal(data)
+	if nil != err {
+		ls.WM("json.Marshal(data)").Error(err)
+		return fmt.Errorf("marshal data to json failed")
+	}
+	err = s.db.Update(func(txn *badger.Txn) error {
+		changedTags, _ := data.DiffTags(nil)
+		changedProps, _ := data.DiffProps(nil)
+		key, pathKey, typeKey := s.buildItemKey(data.Code, data.ParentCode, data.ItemType)
+		err := txn.Delete(key)
+		if nil != err {
+			ls.F("key", key).WM("txn.Delete(key)").Error(err)
+			return fmt.Errorf("delete item from badger failed")
+		}
+		err = txn.Delete(pathKey)
+		if nil != err {
+			ls.F("pathKey", pathKey).WM("txn.Delete(pathKey)").Error(err)
+			return fmt.Errorf("delete item path from badger failed")
+		}
+		err = txn.Delete(typeKey)
+		if nil != err {
+			ls.F("typeKey", typeKey).WM("txn.Delete(typeKey)").Error(err)
+			return fmt.Errorf("delete item type from badger failed")
+		}
+		if nil != changedTags {
+			for k, v := range changedTags {
+				tagKey := s.buildTagKey(data.ItemType, k, v, data.Code)
+				err = txn.Delete(tagKey)
+				if nil != err {
+					ls.F("tagKey", string(tagKey)).WM("txn.Set(tagKey, dbData)").Error(err)
+					return fmt.Errorf("delete item tag failed")
+				}
+			}
+		}
+		if nil != changedProps {
+			for k, v := range changedProps {
+				err = s.incrementSuggestionRef(k, v, -1, txn, ls)
+				if nil != err {
+					ls.WM("s.incrementSuggestionRef(k, v, 1, txn, ls)").Error(err)
+					return fmt.Errorf("decrement suggestion ref to badger failed")
+				}
+			}
+		}
+		return nil
+	})
+
+	if nil != err {
+		ls.WM("s.db.Update(func(txn *badger.Txn) error").Error(err)
+		return err
+	}
+
+	s.writeJournalLine("DeleteItem:", string(dbData))
+	return nil
+}
+
 func (s *Badger) SaveItem(data *items.ItemData) (err error) {
 	ls := s.logger.F("code", data.Code).M("SaveItem")
 	dbData, err := json.Marshal(data)
+	if nil != err {
+		ls.WM("json.Marshal(data)").Error(err)
+		return fmt.Errorf("marshal data to json failed")
+	}
 	codeData := []byte(data.Code)
 	if nil != err {
 		ls.WM("json.Marshal(data)").Error(err)

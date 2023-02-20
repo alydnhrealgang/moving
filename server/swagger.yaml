@@ -136,6 +136,29 @@ paths:
           schema:
             type: string
   /item/{code}:
+    delete:
+      summary: Delete an item
+      operationId: DeleteItemByCode
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: code
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: OK
+        400:
+          description: BadRequest
+          schema:
+            type: string
+        404:
+          description: NotFound
+          schema:
+            type: string
     get:
       summary: Get a item or its children
       operationId: GetItemByCode
