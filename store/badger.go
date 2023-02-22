@@ -445,7 +445,7 @@ func (s *Badger) UpdateItemsParentCode(moved []*items.ItemData, code string) (er
 		ls.WM("s.db.Update(func(txn *badger.Txn) error").Error(err)
 		return fmt.Errorf("update items parent code failed")
 	}
-	s.writeJournalF("UpdateItemsParentCode:[%s] => [%s]", strings.Join(codesToMove, ","), code)
+	s.writeJournalF("UpdateItemsParentCode:[%s] => [%s]\n", strings.Join(codesToMove, ","), code)
 	return nil
 }
 
